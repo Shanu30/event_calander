@@ -1,35 +1,223 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+import { Table, Typography, Dropdown } from "antd";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+
+const dataSource = [
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+  {
+    title: "First row",
+    dataIndex: "firstRow",
+    key: "firstRow",
+    width: 20,
+  },
+];
+
+const columns = [
+  {
+    title: "",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    fixed: "left", // Fix the first column when scrolling left
+    width: 150,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+  {
+    title: "First Column",
+    dataIndex: "firstColumn",
+    key: "firstColumn",
+    width: 100,
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const handleCalendarModal = () => {
+    isCalendarOpen ? setIsCalendarOpen(false) : setIsCalendarOpen(true);
+  };
+  const handleCurrentDay = () => {
+    setDate(new Date());
+  };
+  const handlePrev = () => {
+    setDate(new Date(date.getFullYear(), date.getMonth() - 1, date.getDate()));
+  };
+  const handleNext = () => {
+    setDate(new Date(date.getFullYear(), date.getMonth() + 1, date.getDate()));
+  };
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div
+        style={{
+          height: "60px",
+          padding: "0 15px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          background: "#F7F7F7",
+        }}
+      >
+        <Dropdown
+          overlay={
+            <Calendar
+              onChange={setDate}
+              value={date}
+              style={{ border: "none" }}
+            />
+          }
+          trigger={["click"]}
+          placement="bottomLeft"
+          arrow
+        >
+          <div
+            onClick={(e) => e.preventDefault()}
+            style={{ cursor: "pointer", color: "#007aff", fontSize: "25px" }}
+          >
+            {date.toLocaleString("en-US", { month: "long", year: "numeric" })}
+          </div>
+        </Dropdown>
+        <div style={{ display: "flex", gap: "5px" }}>
+          <LeftOutlined
+            style={{ color: "#007aff", fontSize: "20px", cursor: "pointer" }}
+            onClick={() => handlePrev()}
+          />
+          <Typography
+            style={{ color: "#007aff", fontSize: "15px" }}
+            onClick={() => handleCurrentDay()}
+          >
+            Today
+          </Typography>
+          <RightOutlined
+            style={{ color: "#007aff", fontSize: "20px", cursor: "pointer" }}
+            onClick={() => handleNext()}
+          />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* {isCalendarOpen && <Calendar onChange={setDate} value={date} />} */}
+      {/* <Table
+      width={100}
+      dataSource={dataSource}
+      columns={columns}
+      // scroll={{ x: 50, y: 150 }}
+      bordered
+      sticky */}
+      {/* /> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
