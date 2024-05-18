@@ -1,24 +1,57 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { Table, Typography, Dropdown } from "antd";
+import { Table, Typography, Dropdown, Button, Input, Modal } from "antd";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const [date, setDate] = useState(new Date());
   const [columns, setColumns] = useState([]);
-  const [dataSource, setDataSource] = useState([]);
+  let initialDataSource = [
+    { key: uuidv4(), resource: "task1" },
+    { key: uuidv4(), resource: "task2" },
+  ];
+  // setting the initial dataSource from localStorage
+  try {
+    const storedData = localStorage.getItem("dataSource");
+    if (storedData) {
+      initialDataSource = JSON.parse(storedData);
+    }
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+  }
+  const [dataSource, setDataSource] = useState(initialDataSource);
+  const [isAddResource, setIsAddResource] = useState(false);
+  const [inputResource, setInputResource] = useState("");
+
+  const showAddResourceModal = () => {
+    setIsAddResource(true);
+  };
+  // Add method for dataSource.
+  const CreateAddResource = () => {
+    if (inputResource.trim() !== "") {
+      const newRow = { key: uuidv4(), resource: inputResource };
+      setDataSource([...dataSource, newRow]);
+      setInputResource("");
+    }
+    setIsAddResource(false);
+  };
+  const handleCancel = () => {
+    setIsAddResource(false);
+  };
+  // here setting the updated dataSource in localStorage
   useEffect(() => {
-    const currentDate = date;
+    localStorage.setItem("dataSource", JSON.stringify(dataSource));
+  }, [dataSource]);
+  useEffect(() => {
     const currentMonth = date.getMonth();
     const currentYear = date.getFullYear();
-
+    //method for getting all the dates of month
     const getDatesOfMonth = (month, year) => {
-      console.log(year);
-      console.log(month);
-      console.log(currentDate);
       const dates = [];
+      //formating date table header.
       const formatter = new Intl.DateTimeFormat("en", {
         day: "numeric",
         weekday: "short",
@@ -27,6 +60,7 @@ function App() {
       for (let i = 1; i <= lastDateOfMonth; i++) {
         const currentDate = new Date(year, month, i);
         const formattedDate = formatter.format(currentDate);
+        //pushing all the dates of month in an array to display in table header cells.
         dates.push({
           date: formattedDate,
           isCurrentDate: isSameDate(currentDate, new Date()),
@@ -35,6 +69,7 @@ function App() {
 
       return dates;
     };
+    //method to check the date is same or not.
     const isSameDate = (date1, date2) => {
       return (
         date1.getDate() === date2.getDate() &&
@@ -42,33 +77,15 @@ function App() {
         date1.getFullYear() === date2.getFullYear()
       );
     };
-
     const listOfDates = getDatesOfMonth(currentMonth, currentYear);
-
-    const resourceTitles = [
-      "Resource A",
-      "Resource B",
-      "Resource C",
-      "Resource D",
-      "Resource E",
-      "Resource F",
-      "Resource G",
-      "Resource H",
-      "Resource I",
-      "Resource J",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-      "Resource K",
-    ];
-
+    //defining the columns for table. 
     const newColumns = [
       {
-        title: "",
+        title: (
+          <Button type="primary" onClick={showAddResourceModal}>
+            + Resources
+          </Button>
+        ),
         dataIndex: "resource",
         key: "resource",
         fixed: "left",
@@ -86,26 +103,17 @@ function App() {
         width: 100,
       })),
     ];
-
-    const newDataSource = resourceTitles.map((resource, resourceIndex) => {
-      const resourceData = { key: resourceIndex, resource };
-
-      listOfDates.forEach((_, index) => {
-        resourceData[`date${index}`] = "";
-      });
-
-      return resourceData;
-    });
-
     setColumns(newColumns);
-    setDataSource(newDataSource);
   }, [date]);
+  // method to jump on current date
   const handleCurrentDay = () => {
     setDate(new Date());
   };
+  // method to jump on previous date
   const handlePrev = () => {
     setDate(new Date(date.getFullYear(), date.getMonth() - 1, date.getDate()));
   };
+  // method to jump on next date
   const handleNext = () => {
     setDate(new Date(date.getFullYear(), date.getMonth() + 1, date.getDate()));
   };
@@ -146,6 +154,19 @@ function App() {
           headerClassName="tableHeader"
         />
       </div>
+      <Modal
+        title="Add Resource"
+        open={isAddResource}
+        onOk={CreateAddResource}
+        onCancel={handleCancel}
+      >
+        <Input
+          type="text"
+          value={inputResource}
+          onChange={(e) => setInputResource(e.target.value)}
+          placeholder="Enter the name of Resource"
+        />
+      </Modal>
     </>
   );
 }
