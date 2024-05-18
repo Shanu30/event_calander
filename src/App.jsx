@@ -1,155 +1,105 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Table, Typography, Dropdown } from "antd";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
-const dataSource = [
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-  {
-    title: "First row",
-    dataIndex: "firstRow",
-    key: "firstRow",
-    width: 20,
-  },
-];
-
-const columns = [
-  {
-    title: "",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    fixed: "left", // Fix the first column when scrolling left
-    width: 150,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-  {
-    title: "First Column",
-    dataIndex: "firstColumn",
-    key: "firstColumn",
-    width: 100,
-  },
-];
-
 function App() {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [date, setDate] = useState(new Date());
-  const handleCalendarModal = () => {
-    isCalendarOpen ? setIsCalendarOpen(false) : setIsCalendarOpen(true);
-  };
+  const [columns, setColumns] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  useEffect(() => {
+    const currentDate = date;
+    const currentMonth = date.getMonth();
+    const currentYear = date.getFullYear();
+
+    const getDatesOfMonth = (month, year) => {
+      console.log(year);
+      console.log(month);
+      console.log(currentDate);
+      const dates = [];
+      const formatter = new Intl.DateTimeFormat("en", {
+        day: "numeric",
+        weekday: "short",
+      });
+      const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
+      for (let i = 1; i <= lastDateOfMonth; i++) {
+        const currentDate = new Date(year, month, i);
+        const formattedDate = formatter.format(currentDate);
+        dates.push({
+          date: formattedDate,
+          isCurrentDate: isSameDate(currentDate, new Date()),
+        });
+      }
+
+      return dates;
+    };
+    const isSameDate = (date1, date2) => {
+      return (
+        date1.getDate() === date2.getDate() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getFullYear() === date2.getFullYear()
+      );
+    };
+
+    const listOfDates = getDatesOfMonth(currentMonth, currentYear);
+
+    const resourceTitles = [
+      "Resource A",
+      "Resource B",
+      "Resource C",
+      "Resource D",
+      "Resource E",
+      "Resource F",
+      "Resource G",
+      "Resource H",
+      "Resource I",
+      "Resource J",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+      "Resource K",
+    ];
+
+    const newColumns = [
+      {
+        title: "",
+        dataIndex: "resource",
+        key: "resource",
+        fixed: "left",
+        width: 150,
+        className: "resourceTitle",
+      },
+      ...listOfDates.map((dateInfo, index) => ({
+        title: (
+          <div className={dateInfo.isCurrentDate ? "currentDate" : ""}>
+            {dateInfo.date}
+          </div>
+        ),
+        dataIndex: `date${index}`,
+        key: `date${index}`,
+        width: 100,
+      })),
+    ];
+
+    const newDataSource = resourceTitles.map((resource, resourceIndex) => {
+      const resourceData = { key: resourceIndex, resource };
+
+      listOfDates.forEach((_, index) => {
+        resourceData[`date${index}`] = "";
+      });
+
+      return resourceData;
+    });
+
+    setColumns(newColumns);
+    setDataSource(newDataSource);
+  }, [date]);
   const handleCurrentDay = () => {
     setDate(new Date());
   };
@@ -161,16 +111,7 @@ function App() {
   };
   return (
     <>
-      <div
-        style={{
-          height: "60px",
-          padding: "0 15px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "#F7F7F7",
-        }}
-      >
+      <div className="topBar">
         <Dropdown
           overlay={
             <Calendar
@@ -183,39 +124,28 @@ function App() {
           placement="bottomLeft"
           arrow
         >
-          <div
-            onClick={(e) => e.preventDefault()}
-            style={{ cursor: "pointer", color: "#007aff", fontSize: "25px" }}
-          >
+          <div className="titleText" onClick={(e) => e.preventDefault()}>
             {date.toLocaleString("en-US", { month: "long", year: "numeric" })}
           </div>
         </Dropdown>
-        <div style={{ display: "flex", gap: "5px" }}>
-          <LeftOutlined
-            style={{ color: "#007aff", fontSize: "20px", cursor: "pointer" }}
-            onClick={() => handlePrev()}
-          />
-          <Typography
-            style={{ color: "#007aff", fontSize: "15px" }}
-            onClick={() => handleCurrentDay()}
-          >
+        <div className="topBarRightSection">
+          <LeftOutlined className="nxtPrevIcon" onClick={() => handlePrev()} />
+          <Typography className="todayBtn" onClick={() => handleCurrentDay()}>
             Today
           </Typography>
-          <RightOutlined
-            style={{ color: "#007aff", fontSize: "20px", cursor: "pointer" }}
-            onClick={() => handleNext()}
-          />
+          <RightOutlined className="nxtPrevIcon" onClick={() => handleNext()} />
         </div>
       </div>
-      {/* {isCalendarOpen && <Calendar onChange={setDate} value={date} />} */}
-      {/* <Table
-      width={100}
-      dataSource={dataSource}
-      columns={columns}
-      // scroll={{ x: 50, y: 150 }}
-      bordered
-      sticky */}
-      {/* /> */}
+      <div className="tableWrapper">
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          scroll={{ x: "max-content", y: 660 }}
+          pagination={false}
+          bordered
+          headerClassName="tableHeader"
+        />
+      </div>
     </>
   );
 }
