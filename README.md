@@ -12,12 +12,8 @@
 
 ##Screensort of UI:
 
-<li>
- <h3>Landing Page</h3><br>
-<img  align="center" src="event_calander/public/addResource.png" alt="Add Resources Page" >
-</li>
-<li>
-<h3>SignUp Page</h3><br>
+
+<img  align="center" src="event_calander/public/addResource.png" alt= "Add Resources Page" >
+
 <img  align="center" src="event_calander/public/landing.png" alt="Landing Page" >
-</li>
 
