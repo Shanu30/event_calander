@@ -5,36 +5,44 @@ import { v4 as uuidv4 } from "uuid";
 import CalendarTable from "./components/CalendarTable.jsx";
 import TopBar from "./components/TopBar.jsx";
 import AddResourceModal from "./components/modals/AddResourceModal.jsx";
+import randomColor from "randomcolor";
 
 function App() {
   const [date, setDate] = useState(new Date());
   const [columns, setColumns] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [day, setDay] = useState("");
+  const [source, setSource] = useState("");
   let initialDataSource = [];
+  let initialEvents = [];
   // getting the initial dataSource from localStorage
   try {
-    const storedData = localStorage.getItem("dataSource");
-    if (storedData) {
-      initialDataSource = JSON.parse(storedData);
+    const storedDataSource = localStorage.getItem("dataSource");
+    const storedEvents = localStorage.getItem("events");
+    if (storedDataSource) {
+      initialDataSource = JSON.parse(storedDataSource);
+    }
+    if (storedEvents) {
+      initialEvents = JSON.parse(storedEvents);
     }
   } catch (error) {
     console.error("Error parsing JSON:", error);
   }
   const [dataSource, setDataSource] = useState([initialDataSource]);
+  const [events, setEvents] = useState([initialEvents]);
   const [isAddResource, setIsAddResource] = useState(false);
   const [inputResource, setInputResource] = useState("");
+  let color = randomColor();
 
   const showAddResourceModal = () => {
     setIsAddResource(true);
   };
   const handleEventAdd = (day, resource) => {
-    // const newEvent = {
-    //   id: uuidv4(),
-    //   day,
-    //   resource,
-    //   color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-    // };
-    // setEvents([...events, newEvent]);
+    const newEvent = {
+      id: uuidv4(),
+      day,
+      resource,
+    };
+    setEvents([...events, newEvent]);
   };
 
   const handleEventDelete = (id) => {
@@ -43,7 +51,8 @@ function App() {
   // here setting the updated dataSource in localStorage
   useEffect(() => {
     localStorage.setItem("dataSource", JSON.stringify(dataSource));
-  }, [dataSource]);
+    localStorage.setItem("events", JSON.stringify(events));
+  }, [dataSource, events]);
   useEffect(() => {
     const currentMonth = date.getMonth();
     const currentYear = date.getFullYear();
@@ -100,11 +109,28 @@ function App() {
         dataIndex: `date${index}`,
         key: `date${index}`,
         width: 100,
-        render: () => (
-          <Button onClick={handleEventAdd} className="addEventBtn">
-            +
-          </Button>
-        ),
+        render: (_, record) => {
+          if (dateInfo.date === day && record.resource === source) {
+            return (
+              <div
+                style={{
+                  borderRadius: "5px",
+                  backgroundColor: color,
+                  padding: "5px 10px ",
+                }}
+              >
+                New Event
+              </div>
+            );
+          }
+        },
+        onCell: (record) => ({
+          onClick: () => {
+            setDay(dateInfo.date);
+            setSource(record.resource);
+            handleEventAdd(dateInfo.date, record.resource);
+          },
+        }),
       })),
     ];
     const resourceTitles = [
@@ -122,15 +148,20 @@ function App() {
     ];
     const newDataSource = resourceTitles.map((resource, resourceIndex) => {
       const resourceData = { key: resourceIndex, resource };
-
-      listOfDates.forEach((_, index) => {
-        resourceData[`date${index}`] = "+";
-      });
+      // listOfDates.forEach((_, index) => {
+      //   resourceData[`date${index}`] = "+";
+      // });
+      // const lastDate = listOfDates.length;
+      // for (let i = 1; i <= lastDate; i++) {
+      //   if (events.day === listOfDates.date) {
+      //     resourceData["event"] = "New Event";
+      //   }
+      // }
       return resourceData;
     });
     setColumns(newColumns);
     setDataSource(newDataSource);
-  }, [date]);
+  }, [date, events]);
   return (
     <>
       <TopBar date={date} setDate={setDate} />
@@ -143,16 +174,6 @@ function App() {
         inputResource={inputResource}
         setInputResource={setInputResource}
       />
-      {events.map(event => (
-        <div
-          key={event.id}
-          className="event"
-          style={{ backgroundColor: event.color }}
-          onClick={() => onDeleteEvent(event.id)}
-        >
-          {event}
-        </div>
-      ))}
     </>
   );
 }

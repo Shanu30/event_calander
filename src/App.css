@@ -75,3 +75,6 @@
 .cell-container:hover .addEventBtn {
   visibility: visible;
 }
+.ant-table-wrapper .ant-table-tbody > tr > td:not(:first-child) {
+  padding: 0px;
+}
