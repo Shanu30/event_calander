@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { Table, Typography, Dropdown, Button, Input, Modal } from "antd";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Button } from "antd";
 import { v4 as uuidv4 } from "uuid";
+import CalendarTable from "./components/CalendarTable.jsx";
+import TopBar from "./components/TopBar.jsx";
+import AddResourceModal from "./components/modals/AddResourceModal.jsx";
 
 function App() {
   const [date, setDate] = useState(new Date());
   const [columns, setColumns] = useState([]);
   let initialDataSource = [
-    { key: uuidv4(), resource: "task1" },
-    { key: uuidv4(), resource: "task2" },
+    { key: uuidv4(), resource: "Resource1" },
+    { key: uuidv4(), resource: "Resource2" },
   ];
-  // setting the initial dataSource from localStorage
+  // getting the initial dataSource from localStorage
   try {
     const storedData = localStorage.getItem("dataSource");
     if (storedData) {
@@ -28,18 +28,6 @@ function App() {
 
   const showAddResourceModal = () => {
     setIsAddResource(true);
-  };
-  // Add method for dataSource.
-  const CreateAddResource = () => {
-    if (inputResource.trim() !== "") {
-      const newRow = { key: uuidv4(), resource: inputResource };
-      setDataSource([...dataSource, newRow]);
-      setInputResource("");
-    }
-    setIsAddResource(false);
-  };
-  const handleCancel = () => {
-    setIsAddResource(false);
   };
   // here setting the updated dataSource in localStorage
   useEffect(() => {
@@ -78,7 +66,7 @@ function App() {
       );
     };
     const listOfDates = getDatesOfMonth(currentMonth, currentYear);
-    //defining the columns for table. 
+    //defining the columns for table.
     const newColumns = [
       {
         title: (
@@ -105,68 +93,18 @@ function App() {
     ];
     setColumns(newColumns);
   }, [date]);
-  // method to jump on current date
-  const handleCurrentDay = () => {
-    setDate(new Date());
-  };
-  // method to jump on previous date
-  const handlePrev = () => {
-    setDate(new Date(date.getFullYear(), date.getMonth() - 1, date.getDate()));
-  };
-  // method to jump on next date
-  const handleNext = () => {
-    setDate(new Date(date.getFullYear(), date.getMonth() + 1, date.getDate()));
-  };
   return (
     <>
-      <div className="topBar">
-        <Dropdown
-          overlay={
-            <Calendar
-              onChange={setDate}
-              value={date}
-              style={{ border: "none" }}
-            />
-          }
-          trigger={["click"]}
-          placement="bottomLeft"
-          arrow
-        >
-          <div className="titleText" onClick={(e) => e.preventDefault()}>
-            {date.toLocaleString("en-US", { month: "long", year: "numeric" })}
-          </div>
-        </Dropdown>
-        <div className="topBarRightSection">
-          <LeftOutlined className="nxtPrevIcon" onClick={() => handlePrev()} />
-          <Typography className="todayBtn" onClick={() => handleCurrentDay()}>
-            Today
-          </Typography>
-          <RightOutlined className="nxtPrevIcon" onClick={() => handleNext()} />
-        </div>
-      </div>
-      <div className="tableWrapper">
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          scroll={{ x: "max-content", y: 660 }}
-          pagination={false}
-          bordered
-          headerClassName="tableHeader"
-        />
-      </div>
-      <Modal
-        title="Add Resource"
-        open={isAddResource}
-        onOk={CreateAddResource}
-        onCancel={handleCancel}
-      >
-        <Input
-          type="text"
-          value={inputResource}
-          onChange={(e) => setInputResource(e.target.value)}
-          placeholder="Enter the name of Resource"
-        />
-      </Modal>
+      <TopBar date={date} setDate={setDate} />
+      <CalendarTable columns={columns} dataSource={dataSource} />
+      <AddResourceModal
+        isAddResource={isAddResource}
+        setIsAddResource={setIsAddResource}
+        dataSource={dataSource}
+        setDataSource={setDataSource}
+        inputResource={inputResource}
+        setInputResource={setInputResource}
+      />
     </>
   );
 }
