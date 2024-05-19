@@ -4,8 +4,8 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
-const TopBar = ({date, setDate}) => {
-        // method to jump on current date
+const TopBar = ({ date, setDate }) => {
+  // method to jump on current date
   const handleCurrentDay = () => {
     setDate(new Date());
   };
