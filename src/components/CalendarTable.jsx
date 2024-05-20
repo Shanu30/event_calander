@@ -10,8 +10,6 @@ const CalendarTable = ({ columns, dataSource }) => {
         scroll={{ x: "max-content", y: 660 }}
         pagination={false}
         bordered
-        headerClassName="tableHeader"
-        rowClassName={() => "hoverable-row"}
       />
     </div>
   );

@@ -5,13 +5,13 @@ import { v4 as uuidv4 } from "uuid";
 import CalendarTable from "./components/CalendarTable.jsx";
 import TopBar from "./components/TopBar.jsx";
 import AddResourceModal from "./components/modals/AddResourceModal.jsx";
-import randomColor from "randomcolor";
+import EventBox from "./components/EventBox.jsx";
 
 function App() {
   const [date, setDate] = useState(new Date());
   const [columns, setColumns] = useState([]);
-  const [day, setDay] = useState("");
-  const [source, setSource] = useState("");
+  const [day, setDay] = useState([]);
+  const [source, setSource] = useState([]);
   let initialDataSource = [];
   let initialEvents = [];
   // getting the initial dataSource from localStorage
@@ -27,11 +27,10 @@ function App() {
   } catch (error) {
     console.error("Error parsing JSON:", error);
   }
-  const [dataSource, setDataSource] = useState([initialDataSource]);
+  const [dataSource, setDataSource] = useState(initialDataSource);
   const [events, setEvents] = useState([initialEvents]);
   const [isAddResource, setIsAddResource] = useState(false);
   const [inputResource, setInputResource] = useState("");
-  let color = randomColor();
 
   const showAddResourceModal = () => {
     setIsAddResource(true);
@@ -110,57 +109,22 @@ function App() {
         key: `date${index}`,
         width: 100,
         render: (_, record) => {
-          if (dateInfo.date === day && record.resource === source) {
-            return (
-              <div
-                style={{
-                  borderRadius: "5px",
-                  backgroundColor: color,
-                  padding: "5px 10px ",
-                }}
-              >
-                New Event
-              </div>
-            );
+          for (let i = 0, j = 0; i < day.length; i++, j++) {
+            if (dateInfo.date === day[i] && record.resource === source[j]) {
+              return <EventBox />;
+            }
           }
         },
         onCell: (record) => ({
           onClick: () => {
-            setDay(dateInfo.date);
-            setSource(record.resource);
+            setDay((prevSource) => [...prevSource, dateInfo.date]);
+            setSource((prevSource) => [...prevSource, record.resource]);
             handleEventAdd(dateInfo.date, record.resource);
           },
         }),
       })),
     ];
-    const resourceTitles = [
-      "Resource A",
-      "Resource B",
-      "Resource C",
-      "Resource D",
-      "Resource E",
-      "Resource F",
-      "Resource G",
-      "Resource H",
-      "Resource I",
-      "Resource J",
-      "Resource K",
-    ];
-    const newDataSource = resourceTitles.map((resource, resourceIndex) => {
-      const resourceData = { key: resourceIndex, resource };
-      // listOfDates.forEach((_, index) => {
-      //   resourceData[`date${index}`] = "+";
-      // });
-      // const lastDate = listOfDates.length;
-      // for (let i = 1; i <= lastDate; i++) {
-      //   if (events.day === listOfDates.date) {
-      //     resourceData["event"] = "New Event";
-      //   }
-      // }
-      return resourceData;
-    });
     setColumns(newColumns);
-    setDataSource(newDataSource);
   }, [date, events]);
   return (
     <>
