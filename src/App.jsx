@@ -10,25 +10,41 @@ import EventBox from "./components/EventBox.jsx";
 function App() {
   const [date, setDate] = useState(new Date());
   const [columns, setColumns] = useState([]);
-  const [day, setDay] = useState([]);
-  const [source, setSource] = useState([]);
-  let initialDataSource = [];
-  let initialEvents = [];
+  let initialDataSource = () => {
+    const storedData = localStorage.getItem("dataSource");
+    return storedData ? JSON.parse(storedData) : [];
+  };
+  let initialSource = () => {
+    const storedSource = localStorage.getItem("source");
+    return storedSource ? JSON.parse(storedSource) : [];
+  };
+
+  let initialDay = () => {
+    const storedDay = localStorage.getItem("day");
+    return storedDay ? JSON.parse(storedDay) : [];
+  };
+
+  const [day, setDay] = useState(initialDay);
+  const [source, setSource] = useState(initialSource);
   // getting the initial dataSource from localStorage
   try {
     const storedDataSource = localStorage.getItem("dataSource");
-    const storedEvents = localStorage.getItem("events");
+    const storedSource = localStorage.getItem("source");
+    const storedDay = localStorage.getItem("day");
     if (storedDataSource) {
       initialDataSource = JSON.parse(storedDataSource);
     }
-    if (storedEvents) {
-      initialEvents = JSON.parse(storedEvents);
+    if (storedDay) {
+      initialDay = JSON.parse(storedDay);
+    }
+    if (storedSource) {
+      initialSource = JSON.parse(storedSource);
     }
   } catch (error) {
     console.error("Error parsing JSON:", error);
   }
   const [dataSource, setDataSource] = useState(initialDataSource);
-  const [events, setEvents] = useState([initialEvents]);
+  const [events, setEvents] = useState([]);
   const [isAddResource, setIsAddResource] = useState(false);
   const [inputResource, setInputResource] = useState("");
 
@@ -47,11 +63,15 @@ function App() {
   const handleEventDelete = (id) => {
     setEvents(events.filter((event) => event.id !== id));
   };
-  // here setting the updated dataSource in localStorage
+  // here setting the updated data in localStorage
   useEffect(() => {
     localStorage.setItem("dataSource", JSON.stringify(dataSource));
-    localStorage.setItem("events", JSON.stringify(events));
-  }, [dataSource, events]);
+  }, [dataSource]);
+
+  useEffect(() => {
+    localStorage.setItem("source", JSON.stringify(source));
+    localStorage.setItem("day", JSON.stringify(day));
+  }, [source, day]);
   useEffect(() => {
     const currentMonth = date.getMonth();
     const currentYear = date.getFullYear();
@@ -117,8 +137,8 @@ function App() {
         },
         onCell: (record) => ({
           onClick: () => {
-            setDay((prevSource) => [...prevSource, dateInfo.date]);
-            setSource((prevSource) => [...prevSource, record.resource]);
+            setDay([...day, dateInfo.date]);
+            setSource([...source, record.resource]);
             handleEventAdd(dateInfo.date, record.resource);
           },
         }),
