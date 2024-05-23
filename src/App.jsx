@@ -59,10 +59,6 @@ function App() {
     };
     setEvents([...events, newEvent]);
   };
-
-  const handleEventDelete = (id) => {
-    setEvents(events.filter((event) => event.id !== id));
-  };
   // here setting the updated data in localStorage
   useEffect(() => {
     localStorage.setItem("dataSource", JSON.stringify(dataSource));
@@ -131,6 +127,7 @@ function App() {
         render: (_, record) => {
           for (let i = 0, j = 0; i < day.length; i++, j++) {
             if (dateInfo.date === day[i] && record.resource === source[j]) {
+              
               return <EventBox />;
             }
           }
